@@ -44,6 +44,7 @@ void HDMI_OnReady(class CEC_Device* self, int logical_address) {
 void HDMI_OnReceive(class CEC_Device *self, int32_t from, int32_t to, uint8_t* buf, size_t len, bool ack)
 {
 	AddLog(LOG_LEVEL_DEBUG, "CEC: Packet received: (%1X->%1X) %1X%1X%*_H %s", from, to, from, to, len, buf, ack ? PSTR("ACK") : PSTR("NAK"));
+  if (len > 0) AddLog(LOG_LEVEL_DEBUG_MORE, "CEC: Message: %s", HDMI_GetMessageName(self, buf[0]).c_str());
 
   Response_P(PSTR("{\"HdmiReceived\":{\"From\":%i,\"To\":%i,\"Data\":\"%*_H\"}}"), from, to, len, buf);
   if (to == self->getLogicalAddress() || to == 0x0F) {
@@ -56,6 +57,75 @@ void HDMI_OnTransmit(class CEC_Device *self, uint8_t* buf, size_t len, bool ack)
 {
 	// This is called after a frame is transmitted.
   AddLog(LOG_LEVEL_DEBUG, "CEC: Packet sent: %*_H %s", len, buf, ack ? PSTR("ACK") : PSTR("NAK"));
+}
+
+String HDMI_GetMessageName(class CEC_Device *self, uint8_t command)
+{
+  switch (command) {
+    case self->OP_ACTIVE_SOURCE: return "OP_ACTIVE_SOURCE";
+    case self->OP_IMAGE_VIEW: return "OP_IMAGE_VIEW";
+    case self->OP_TEXT_VIEW_ON: return "OP_TEXT_VIEW_ON";
+    case self->OP_INACTIVE_SOURCE: return "OP_INACTIVE_SOURCE";
+    case self->OP_REQUEST_ACITVE_SOURCE: return "OP_REQUEST_ACITVE_SOURCE";
+    case self->OP_ROUTING_CHANGE: return "OP_ROUTING_CHANGE";
+    case self->OP_ROUTING_INFORMATION: return "OP_ROUTING_INFORMATION";
+    case self->OP_SET_STREAM_PATH: return "OP_SET_STREAM_PATH";
+    case self->OP_STANDBY: return "OP_STANDBY";
+    case self->OP_RECORD_OFF: return "OP_RECORD_OFF";
+    case self->OP_RECORD_ON: return "OP_RECORD_ON";
+    case self->OP_RECORD_STATUS: return "OP_RECORD_STATUS";
+    case self->OP_RECORD_TV_SCREEN: return "OP_RECORD_TV_SCREEN";
+    case self->OP_CLEAR_ANALOGUE_TIMER: return "OP_CLEAR_ANALOGUE_TIMER";
+    case self->OP_CLEAR_DIGITAL_TIMER: return "OP_CLEAR_DIGITAL_TIMER";
+    case self->OP_CLEAR_EXTERNAL_TIMER: return "OP_CLEAR_EXTERNAL_TIMER";
+    case self->OP_SET_ANALOGUE_TIMER: return "OP_SET_ANALOGUE_TIMER";
+    case self->OP_SET_DIGITAL_TIMER: return "OP_SET_DIGITAL_TIMER";
+    case self->OP_SET_EXTERNAL_TIMER: return "OP_SET_EXTERNAL_TIMER";
+    case self->OP_SET_TIMER_PROGRAM_TITLE: return "OP_SET_TIMER_PROGRAM_TITLE";
+    case self->OP_TIMER_CLEARED_STATUS: return "OP_TIMER_CLEARED_STATUS";
+    case self->OP_TIMER_STATUS: return "OP_TIMER_STATUS";
+    case self->OP_CEC_VERSION: return "OP_CEC_VERSION";
+    case self->OP_GET_CEC_VERSION: return "OP_GET_CEC_VERSION";
+    case self->OP_GIVE_PHYSICAL_ADDRESS: return "OP_GIVE_PHYSICAL_ADDRESS";
+    case self->OP_GET_MENU_LANGUAGE: return "OP_GET_MENU_LANGUAGE";
+    case self->OP_REPORT_PHYSICAL_ADDRESS: return "OP_REPORT_PHYSICAL_ADDRESS";
+    case self->OP_SET_MENU_LANGUAGE: return "OP_SET_MENU_LANGUAGE";
+    case self->OP_DECK_CONTROL: return "OP_DECK_CONTROL";
+    case self->OP_DECK_STATUS: return "OP_DECK_STATUS";
+    case self->OP_GIVE_DECK_STATUS: return "OP_GIVE_DECK_STATUS";
+    case self->OP_PLAY: return "OP_PLAY";
+    case self->OP_GIVE_TUNER_DEVICE_STATUS: return "OP_GIVE_TUNER_DEVICE_STATUS";
+    case self->OP_SELECT_ANALOGUE_DEVICE: return "OP_SELECT_ANALOGUE_DEVICE";
+    case self->OP_SELECT_DIGITAL_DEVICE: return "OP_SELECT_DIGITAL_DEVICE";
+    case self->OP_TUNER_DEVICE_STATUS: return "OP_TUNER_DEVICE_STATUS";
+    case self->OP_TUNER_STEP_DECFREMENT: return "OP_TUNER_STEP_DECFREMENT";
+    case self->OP_TUNER_STEP_INCREMENT: return "OP_TUNER_STEP_INCREMENT";
+    case self->OP_DEVICE_VENDOR_ID: return "OP_DEVICE_VENDOR_ID";
+    case self->OP_GIVE_DEVICE_VENDOR_ID: return "OP_GIVE_DEVICE_VENDOR_ID";
+    case self->OP_VENDOR_COMMAND: return "OP_VENDOR_COMMAND";
+    case self->OP_VENDOR_COMMAND_WITH_ID: return "OP_VENDOR_COMMAND_WITH_ID";
+    case self->OP_VENDOR_REMOTE_BUTTON_DOWN: return "OP_VENDOR_REMOTE_BUTTON_DOWN";
+    case self->OP_VENDOR_REMOTE_BUTTON_UP: return "OP_VENDOR_REMOTE_BUTTON_UP";
+    case self->OP_SET_OSD_SCREEN: return "OP_SET_OSD_SCREEN";
+    case self->OP_GIVE_OSD_SCREEN: return "OP_GIVE_OSD_SCREEN";
+    case self->OP_SET_OSD_NAME: return "OP_SET_OSD_NAME";
+    case self->OP_MENU_REQUEST: return "OP_MENU_REQUEST";
+    case self->OP_MENU_STATUS: return "OP_MENU_STATUS";
+    case self->OP_USER_CONTROL_PRESSED: return "OP_USER_CONTROL_PRESSED";
+    case self->OP_USER_CONTROL_RELEASED: return "OP_USER_CONTROL_RELEASED";
+    case self->OP_GIVE_DEVICE_POWER_STATUS: return "OP_GIVE_DEVICE_POWER_STATUS";
+    case self->OP_REPORT_POWER_STATUS: return "OP_REPORT_POWER_STATUS";
+    case self->OP_FEATURE_ABORT: return "OP_FEATURE_ABORT";
+    case self->OP_ABORT: return "OP_ABORT";
+    case self->OP_GIVE_AUDIO_STATUS: return "OP_GIVE_AUDIO_STATUS";
+    case self->OP_GIVE_SYSTEM_AUDIO_MODE_STATUS: return "OP_GIVE_SYSTEM_AUDIO_MODE_STATUS";
+    case self->OP_REPORT_AUDIO_STATUS: return "OP_REPORT_AUDIO_STATUS";
+    case self->OP_SET_SYSTEM_AUDIO_MODE: return "OP_SET_SYSTEM_AUDIO_MODE";
+    case self->OP_SYSTEM_AUDIO_MODE_REQUEST: return "OP_SYSTEM_AUDIO_MODE_REQUEST";
+    case self->OP_SYSTEM_AUDIO_MODE_STATUS: return "OP_SYSTEM_AUDIO_MODE_STATUS";
+    case self->OP_SET_AUDIO_RATE: return "OP_SET_AUDIO_RATE";
+    default: return "Unknown";
+  }
 }
 
 // singleton for HDMI CEC object, could be expanded if we manage multiple HDMI in parallel

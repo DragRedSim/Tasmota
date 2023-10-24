@@ -1148,14 +1148,29 @@ void CEC_Device::OnReceiveComplete(uint8_t * buf, size_t len, bool ack)
     { // <Give Physical Address>
       int32_t physicalAddress = getPhysicalAddress();
       uint8_t buf[4] = { OP_REPORT_PHYSICAL_ADDRESS /*0x84*/, (uint8_t)(physicalAddress >> 8), (uint8_t)physicalAddress, _type};
-      transmitFrame(0xf, buf, 4); // <Report Physical Address>
+      transmitFrame(0xf, buf, sizeof(buf)/sizeof(buf[0])); // <Report Physical Address>
       break;
     }
-    case OP_GIVE_DEVICE_VENDOR_ID /*0x8C*/: // <Give Device Vendor ID>
+    case OP_GIVE_DEVICE_VENDOR_ID /*0x8C*/:
+    { // <Give Device Vendor ID>
       uint32_t vendor = getVendorId();
       uint8_t buf[4] = { OP_DEVICE_VENDOR_ID /*0x87*/, (uint8_t)vendor, (uint8_t)(vendor >> 8), (uint8_t)(vendor >> 16)};
-      transmitFrame(0xf, buf, 4); // <Device Vendor ID>
+      transmitFrame(0xf, buf, sizeof(buf)/sizeof(buf[0])); // <Device Vendor ID>
       break;
+  }
+    case OP_GET_CEC_VERSION /*0x9F*/:
+    { // <Get CEC Version>
+      uint8_t cecVersion = 0x01; //CEC v1.2
+      uint8_t buf[2] = { OP_CEC_VERSION /*0x9E*/, cecVersion };
+      transmitFrame((uint8_t)from, buf, sizeof(buf)/sizeof(buf[0])); // <CEC Version>
+      break;
+    }
+    case OP_GIVE_OSD_SCREEN /*0x46*/:
+    { // <Give OSD Screen Name>
+      uint8_t buf[8] = { OP_SET_OSD_SCREEN, 0x54, 0x61, 0x73, 0x6D, 0x6F, 0x74, 0x61 }; //"Tasmota"
+      transmitFrame((uint8_t)from, buf, sizeof(buf)/sizeof(buf[0])); // <Set OSD Screen Name>
+      break;
+    }
   }
 }
 
