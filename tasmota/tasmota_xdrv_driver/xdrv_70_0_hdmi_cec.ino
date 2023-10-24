@@ -444,12 +444,14 @@ CEC_Device::CEC_Device(int gpio, CEC_DEVICE_TYPE type, bool promiscuous, bool mo
   static const uint8_t valid_LogicalAddressesPlay[4]  = {CLA_PLAYBACK_DEVICE_1,  CLA_PLAYBACK_DEVICE_2,  CLA_PLAYBACK_DEVICE_3,  CLA_UNREGISTERED};
   static const uint8_t valid_LogicalAddressesTuner[5] = {CLA_TUNER_1,            CLA_TUNER_2,            CLA_TUNER_3,            CLA_TUNER_4,        CLA_UNREGISTERED};
   static const uint8_t valid_LogicalAddressesAudio[2] = {CLA_AUDIO_SYSTEM,       CLA_UNREGISTERED};
+  static const uint8_t valid_LogicalAddressesReserved[3] = {CLA_RESERVED_1,      CLA_RESERVED_2,         CLA_UNREGISTERED};
   switch(type) {
   case CDT_TV:               _valid_logical_addr = valid_LogicalAddressesTV;    break;
   case CDT_RECORDING_DEVICE: _valid_logical_addr = valid_LogicalAddressesRec;   break;
   case CDT_PLAYBACK_DEVICE:  _valid_logical_addr = valid_LogicalAddressesPlay;  break;
   case CDT_TUNER:            _valid_logical_addr = valid_LogicalAddressesTuner; break;
   case CDT_AUDIO_SYSTEM:     _valid_logical_addr = valid_LogicalAddressesAudio; break;
+  case CDT_RESERVED:         _valid_logical_addr = valid_LogicalAddressesReserved; break;
   default:                   _valid_logical_addr = NULL;
   }
 
