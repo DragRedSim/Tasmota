@@ -241,7 +241,18 @@ public:
     OP_SYSTEM_AUDIO_MODE_REQUEST = 0x70,
     OP_SYSTEM_AUDIO_MODE_STATUS = 0x7E,
     OP_SET_AUDIO_RATE = 0x9A,
-  } CEC_OPCODES;
+    /* start CEC 1.4 codes, based on https://github.com/Pulse-Eight/libcec/blob/master/include/cectypes.h#815 */
+    OP_REPORT_SHORT_AUDIO_DESCRIPTORS   = 0xA3,
+    OP_REQUEST_SHORT_AUDIO_DESCRIPTORS  = 0xA4,
+    OP_START_ARC                        = 0xC0,
+    OP_REPORT_ARC_STARTED               = 0xC1,
+    OP_REPORT_ARC_ENDED                 = 0xC2,
+    OP_REQUEST_ARC_START                = 0xC3,
+    OP_REQUEST_ARC_END                  = 0xC4,
+    OP_END_ARC                          = 0xC5,
+    OP_CDC                              = 0xF8,
+    /* end CEC 1.4 codes */
+  } OPS;
 
 public:
   // Low-level 
@@ -1167,8 +1178,14 @@ void CEC_Device::OnReceiveComplete(uint8_t * buf, size_t len, bool ack)
     }
     case OP_GIVE_OSD_SCREEN /*0x46*/:
     { // <Give OSD Screen Name>
-      uint8_t buf[8] = { OP_SET_OSD_SCREEN, 0x54, 0x61, 0x73, 0x6D, 0x6F, 0x74, 0x61 }; //"Tasmota"
+      uint8_t buf[8] = { OP_SET_OSD_NAME, 0x54, 0x61, 0x73, 0x6D, 0x6F, 0x74, 0x61 }; //"Tasmota"
       transmitFrame((uint8_t)from, buf, sizeof(buf)/sizeof(buf[0])); // <Set OSD Screen Name>
+      break;
+    }
+    case OP_GIVE_DEVICE_POWER_STATUS /*0x8F*/:
+    { // <Give Device Power Status>
+      uint8_t buf[2] = { OP_REPORT_POWER_STATUS, 0x00 };
+      transmitFrame((uint8_t)from, buf, sizeof(buf)/sizeof(buf[0])); // <Report Power Status>
       break;
     }
   }

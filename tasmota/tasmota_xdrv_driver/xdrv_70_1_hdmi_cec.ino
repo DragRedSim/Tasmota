@@ -43,8 +43,23 @@ void HDMI_OnReady(class CEC_Device* self, int logical_address) {
 
 void HDMI_OnReceive(class CEC_Device *self, int32_t from, int32_t to, uint8_t* buf, size_t len, bool ack)
 {
-	AddLog(LOG_LEVEL_DEBUG, "CEC: Packet received: (%1X->%1X) %1X%1X%*_H %s", from, to, from, to, len, buf, ack ? PSTR("ACK") : PSTR("NAK"));
-  if (len > 0) AddLog(LOG_LEVEL_DEBUG_MORE, "CEC: Message: %s", HDMI_GetMessageName(self, buf[0]).c_str());
+	AddLog(LOG_LEVEL_DEBUG, "CEC: Packet received: (%1X->%1X) len=%u %1X%1X%*_H %s", from, to, len, from, to, len, buf, ack ? PSTR("ACK") : PSTR("NAK"));
+  if ( len == 0 ) {
+    AddLog(LOG_LEVEL_DEBUG_MORE, "CEC: Poll message");
+  }
+  else if ( len > 1 && /* these codes have an ASCII payload following */
+        buf[0] == self->OP_SET_TIMER_PROGRAM_TITLE /* 0x67 */ || 
+        buf[0] == self->OP_SET_OSD_SCREEN /* 0x64 */ ||
+        buf[0] == self->OP_SET_OSD_NAME /* 0x47 */
+        )
+    {
+      AddLog(LOG_LEVEL_DEBUG_MORE, "CEC: Message: %s, len = %u (\"%.*s\")", HDMI_GetMessageName(self, buf[0]).c_str(), len, len-1, &buf[1]);
+      /* skip first character by dereferencing buffer, increment by sizeof(buf[0]), take pointer*/
+    }
+  else if (len >= 1) /* opcode only, or encoded message */
+    {
+      AddLog(LOG_LEVEL_DEBUG_MORE, "CEC: Message: %s, len = %u", HDMI_GetMessageName(self, buf[0]).c_str(), len);
+    }
 
   Response_P(PSTR("{\"HdmiReceived\":{\"From\":%i,\"To\":%i,\"Data\":\"%*_H\"}}"), from, to, len, buf);
   if (to == self->getLogicalAddress() || to == 0x0F) {
@@ -124,6 +139,15 @@ String HDMI_GetMessageName(class CEC_Device *self, uint8_t command)
     case self->OP_SYSTEM_AUDIO_MODE_REQUEST: return "OP_SYSTEM_AUDIO_MODE_REQUEST";
     case self->OP_SYSTEM_AUDIO_MODE_STATUS: return "OP_SYSTEM_AUDIO_MODE_STATUS";
     case self->OP_SET_AUDIO_RATE: return "OP_SET_AUDIO_RATE";
+    case self->OP_REPORT_SHORT_AUDIO_DESCRIPTORS: return "OP_REPORT_SHORT_AUDIO_DESCRIPTORS";
+    case self->OP_REQUEST_SHORT_AUDIO_DESCRIPTORS: return "OP_REQUEST_SHORT_AUDIO_DESCRIPTORS";
+    case self->OP_START_ARC: return "OP_START_ARC";
+    case self->OP_REPORT_ARC_STARTED: return "OP_REPORT_ARC_STARTED";
+    case self->OP_REPORT_ARC_ENDED: return "OP_REPORT_ARC_ENDED";
+    case self->OP_REQUEST_ARC_START: return "OP_REQUEST_ARC_START";
+    case self->OP_REQUEST_ARC_END: return "OP_REQUEST_ARC_END";
+    case self->OP_END_ARC: return "OP_END_ARC";
+    case self->OP_CDC: return "OP_CDC";
     default: return "Unknown";
   }
 }
