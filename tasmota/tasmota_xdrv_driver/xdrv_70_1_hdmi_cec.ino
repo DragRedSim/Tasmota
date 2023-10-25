@@ -81,7 +81,7 @@ String HDMI_GetMessageName(class CEC_Device *self, uint8_t command)
     case self->OP_IMAGE_VIEW: 											  return "OP_IMAGE_VIEW";
     case self->OP_TEXT_VIEW_ON: 											return "OP_TEXT_VIEW_ON";
     case self->OP_INACTIVE_SOURCE: 										return "OP_INACTIVE_SOURCE";
-    case self->OP_REQUEST_ACITVE_SOURCE:						  return "OP_REQUEST_ACITVE_SOURCE";
+    case self->OP_REQUEST_ACTIVE_SOURCE:						  return "OP_REQUEST_ACTIVE_SOURCE";
     case self->OP_ROUTING_CHANGE: 										return "OP_ROUTING_CHANGE";
     case self->OP_ROUTING_INFORMATION:								return "OP_ROUTING_INFORMATION";
     case self->OP_SET_STREAM_PATH: 										return "OP_SET_STREAM_PATH";
